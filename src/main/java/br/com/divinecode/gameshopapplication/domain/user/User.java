@@ -1,5 +1,6 @@
 package br.com.divinecode.gameshopapplication.domain.user;
 
+import br.com.divinecode.gameshopapplication.domain.cart.Cart;
 import br.com.divinecode.gameshopapplication.domain.permission.Permission;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class User implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String username;
@@ -38,6 +39,10 @@ public class User implements UserDetails {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
+    private Cart cart;
 
     public User() {
         this.enabled = true;

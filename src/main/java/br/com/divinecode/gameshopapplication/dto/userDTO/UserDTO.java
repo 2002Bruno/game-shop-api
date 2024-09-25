@@ -1,5 +1,6 @@
 package br.com.divinecode.gameshopapplication.dto.userDTO;
 
+import br.com.divinecode.gameshopapplication.domain.cart.Cart;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,4 +17,6 @@ public class UserDTO implements Serializable {
     private String email;
 
     private String password;
+
+    private Cart cart;
 }

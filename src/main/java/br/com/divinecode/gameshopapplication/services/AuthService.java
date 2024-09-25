@@ -1,10 +1,13 @@
-package br.com.divinecode.gameshopapplication.services.auth;
+package br.com.divinecode.gameshopapplication.services;
 
+import br.com.divinecode.gameshopapplication.domain.cart.Cart;
 import br.com.divinecode.gameshopapplication.domain.user.User;
 import br.com.divinecode.gameshopapplication.dto.security.AccountCredentialsDTO;
 import br.com.divinecode.gameshopapplication.dto.security.TokenDTO;
 import br.com.divinecode.gameshopapplication.dto.userDTO.UserDTO;
+import br.com.divinecode.gameshopapplication.repositories.CartRepository;
 import br.com.divinecode.gameshopapplication.repositories.UserRepository;
+import br.com.divinecode.gameshopapplication.services.security.jwt.TokenProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +33,12 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private CartService cartService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CartRepository cartRepository;
 
     public AuthService(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
@@ -47,7 +55,7 @@ public class AuthService {
             var tokenResponse = new TokenDTO();
 
             if (Objects.nonNull(user)) {
-                tokenResponse = tokenProvider.createAccessToken(user.getUsername(), user.getRoles());
+                tokenResponse = tokenProvider.createAccessToken(user.getEmail(), user.getRoles());
 
                 return ResponseEntity.ok(tokenResponse);
             } else {
@@ -59,12 +67,15 @@ public class AuthService {
     }
 
     public void register(UserDTO userDTO) {
+        ModelMapper mapper = new ModelMapper();
+        Cart cart = new Cart();
+
         User byEmail = userRepository.findByEmail(userDTO.getEmail());
         if (Objects.nonNull(byEmail)) {
             throw new RuntimeException("Email já existe.");
         }
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        ModelMapper mapper = new ModelMapper();
+        userDTO.setCart(cart);
 
         User userMap = mapper.map(userDTO, User.class);
         userRepository.save(userMap);

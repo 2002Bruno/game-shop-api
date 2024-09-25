@@ -1,4 +1,4 @@
-package br.com.divinecode.gameshopapplication.services.auth;
+package br.com.divinecode.gameshopapplication.services.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

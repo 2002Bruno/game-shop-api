@@ -1,4 +1,4 @@
-package br.com.divinecode.gameshopapplication.services.auth;
+package br.com.divinecode.gameshopapplication.services.security.jwt;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
@@ -13,6 +13,10 @@ public class JwtConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilt
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    public JwtConfigurer(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
 
     @Override
     public void configure(HttpSecurity httpSecurity) {

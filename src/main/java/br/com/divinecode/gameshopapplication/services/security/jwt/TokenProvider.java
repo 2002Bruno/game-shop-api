@@ -1,4 +1,4 @@
-package br.com.divinecode.gameshopapplication.services.auth;
+package br.com.divinecode.gameshopapplication.services.security.jwt;
 
 import br.com.divinecode.gameshopapplication.dto.security.TokenDTO;
 import br.com.divinecode.gameshopapplication.exceptions.InvalidJwtAuthenticationException;
@@ -26,7 +26,7 @@ import java.util.Objects;
 public class TokenProvider {
 
     @Value("${api.security.token.secret}")
-    private String secretKey;
+    private String secretKey = "SaborOverdoseNoYakisoba";
 
     @Value("${security.jwt.token.expire-length:3600000}")
     private long validInMilliSeconds = 3600000; // Equivale a 1h
@@ -62,6 +62,15 @@ public class TokenProvider {
                 .strip();
     }
 
+    public TokenDTO refreshToken(String refreshToken) {
+        if (refreshToken.contains("")) refreshToken = refreshToken.substring("Bearer ".length());
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = verifier.verify(refreshToken);
+        String username = decodedJWT.getSubject();
+        List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+        return createAccessToken(username, roles);
+    }
+
     public String getRefreshToken(String username, List<String> roles, Date now) {
         Date validRefreshToken = new Date(now.getTime() + validInMilliSeconds);
         String issuerUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
@@ -77,9 +86,9 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         DecodedJWT decodedJWT = decodedToken(token);
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(decodedJWT.getSubject());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(decodedJWT.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "");
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public DecodedJWT decodedToken(String token) {
