@@ -1,9 +1,8 @@
 package br.com.divinecode.gameshopapplication.controllers;
 
 import br.com.divinecode.gameshopapplication.domain.cart.Cart;
-import br.com.divinecode.gameshopapplication.domain.product.Product;
-import br.com.divinecode.gameshopapplication.domain.user.User;
-import br.com.divinecode.gameshopapplication.dto.userDTO.UserDTO;
+import br.com.divinecode.gameshopapplication.dto.CartDTO.CartDTO;
+import br.com.divinecode.gameshopapplication.exceptions.CartNotFoundException;
 import br.com.divinecode.gameshopapplication.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +17,19 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findCartById(@PathVariable("id") Long id) {
-        Cart byId = cartService.findById(id);
-        return ResponseEntity.ok(byId);
+    @GetMapping("/{cartId}")
+    public ResponseEntity<?> findCartById(@PathVariable("cartId") Long cartId) {
+        try {
+            Cart byId = cartService.findById(cartId);
+            return ResponseEntity.ok().body(byId);
+        } catch (Exception e) {
+            throw new CartNotFoundException("Cart não encontrado");
+        }
     }
 
-    @PostMapping("/{productId}")
-    public ResponseEntity<?> findCartById(@PathVariable("productId") List<Product> productsIds, @RequestBody UserDTO userDTO) {
-        Cart cart = cartService.addProductToCart(userDTO, productsIds);
+    @PostMapping("/add-product/{cartId}")
+    public ResponseEntity<?> addProductToCart(@PathVariable("cartId") Long cartId, @RequestBody CartDTO cartDTO) {
+        Cart cart = cartService.addProductToCart(cartId, cartDTO);
 
         return ResponseEntity.ok(cart);
     }

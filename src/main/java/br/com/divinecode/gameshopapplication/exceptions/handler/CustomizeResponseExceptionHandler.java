@@ -1,5 +1,6 @@
 package br.com.divinecode.gameshopapplication.exceptions.handler;
 
+import br.com.divinecode.gameshopapplication.exceptions.CartNotFoundException;
 import br.com.divinecode.gameshopapplication.exceptions.InvalidJwtAuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,15 @@ public class CustomizeResponseExceptionHandler extends ResponseEntityExceptionHa
                 ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(exeptionResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(CartNotFoundException.class)
+    public final ResponseEntity<ExeptionResponse> CartNotFoundException(Exception ex, WebRequest request) {
+        ExeptionResponse exeptionResponse = new ExeptionResponse(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<>(exeptionResponse, HttpStatus.NOT_FOUND);
     }
 }

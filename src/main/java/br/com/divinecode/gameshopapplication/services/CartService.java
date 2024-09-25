@@ -5,10 +5,13 @@ import br.com.divinecode.gameshopapplication.domain.product.Product;
 import br.com.divinecode.gameshopapplication.domain.user.User;
 import br.com.divinecode.gameshopapplication.dto.CartDTO.CartDTO;
 import br.com.divinecode.gameshopapplication.dto.userDTO.UserDTO;
+import br.com.divinecode.gameshopapplication.exceptions.CartNotFoundException;
 import br.com.divinecode.gameshopapplication.repositories.CartRepository;
+import br.com.divinecode.gameshopapplication.repositories.ProductRepository;
 import br.com.divinecode.gameshopapplication.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,28 +24,24 @@ public class CartService {
     private CartRepository cartRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private ProductRepository productRepository;
 
-    public Cart findById(Long id) {
-        Cart cartById = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
+    public Cart findById(Long cartId) {
+        Cart cartById = cartRepository.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found"));
 
         return cartById;
     }
 
-    public Cart addProductToCart(UserDTO userDTO, List<Product> productsIds) {
-        User userByEmail = userRepository.findByEmail(userDTO.getEmail());
-
-        if (Objects.nonNull(userByEmail.getCart())) {
-            Cart cart = userByEmail.getCart();
-            CartDTO cartDTO = new CartDTO();
-            cartDTO.setId(cart.getId());
-            cartDTO.setUserId(userByEmail.getId());
-            cartDTO.setProducts(productsIds);
-
-            ModelMapper mapper = new ModelMapper();
-            Cart cartMapped = mapper.map(cartDTO, Cart.class);
-
-            return cartRepository.save(cartMapped);
+    public Cart addProductToCart(Long cartId, CartDTO cartDTO) {
+        try {
+            Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Usuário não foi encontrado"));
+            List<Product> allProductsById = productRepository.findAllById(cartDTO.getProducts());
+            if (Objects.nonNull(cart)) {
+                cart.setProducts(allProductsById);
+                return cartRepository.save(cart);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao adicionar produtos no carrinho");
         }
         return null;
     }

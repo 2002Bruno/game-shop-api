@@ -20,7 +20,11 @@ public class Cart implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relacionamento de um carrinho para muitos produtos
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "cart_products", // Nome da tabela de junção
+            joinColumns = @JoinColumn(name = "cart_id"), // Chave estrangeira para Cart
+            inverseJoinColumns = @JoinColumn(name = "product_id") // Chave estrangeira para Product
+    )
     private List<Product> products = new ArrayList<>();
 }

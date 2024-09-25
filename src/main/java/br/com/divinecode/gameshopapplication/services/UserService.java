@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService implements UserDetailsService {
 
@@ -29,5 +31,14 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             throw new UsernameNotFoundException("Este email não foi encontrado: " + email);
         }
+    }
+
+    public UserDTO findById(Long id) {
+        ModelMapper mapper = new ModelMapper();
+
+        Optional<User> byId = userRepository.findById(id);
+        UserDTO userMapped = mapper.map(byId, UserDTO.class);
+
+        return userMapped;
     }
 }

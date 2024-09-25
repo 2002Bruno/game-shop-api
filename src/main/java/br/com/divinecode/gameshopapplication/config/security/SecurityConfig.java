@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/cart/**").authenticated());
+                        .requestMatchers("/cart/**", "/user/**").authenticated());
 
         http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

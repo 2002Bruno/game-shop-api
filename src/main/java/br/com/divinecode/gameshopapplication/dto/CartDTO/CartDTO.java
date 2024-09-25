@@ -13,7 +13,5 @@ public class CartDTO implements Serializable {
 
     private Long id;
 
-    private Long userId;
-
-    private List<Product> products;
+    private List<Long> products;
 }
