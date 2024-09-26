@@ -45,4 +45,18 @@ public class CartService {
         }
         return null;
     }
+
+    public Cart removeProductCart(Long cartId, CartDTO cartDTO) {
+        try {
+            Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Usuário não foi encontrado"));
+            List<Product> allProductsById = productRepository.findAllById(cartDTO.getProducts());
+            if (Objects.nonNull(cart)) {
+                cart.getProducts().removeAll(allProductsById);
+                return cartRepository.saveAndFlush(cart);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao adicionar produtos no carrinho");
+        }
+        return null;
+    }
 }

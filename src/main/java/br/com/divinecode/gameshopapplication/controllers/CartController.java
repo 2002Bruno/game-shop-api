@@ -33,4 +33,11 @@ public class CartController {
 
         return ResponseEntity.ok(cart);
     }
+
+    @PutMapping("/remove-product/{cartId}")
+    public ResponseEntity<?> removeProductToCart(@PathVariable("cartId") Long cartId, @RequestBody CartDTO cartDTO) {
+        Cart cart = cartService.removeProductCart(cartId, cartDTO);
+
+        return ResponseEntity.ok(cart);
+    }
 }
