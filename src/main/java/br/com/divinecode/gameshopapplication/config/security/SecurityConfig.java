@@ -28,7 +28,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/v3/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/cart/**", "/user/**").authenticated());
 
         http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
